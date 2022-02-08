@@ -3,18 +3,22 @@
       <sections class="forms">
 
           <form class="register" @submit.prevent="register">
-              <h2>Register</h2>
-              <input 
-                type="email" 
-                placeholder="Email Address"
-                v-model="register_form.email" />
-                <input 
-                    type="password" 
-                    placeholder="Password" 
-                    v-model="register_form.password" />
-                <input 
-                    type="submit" 
-                    value="Register" />
+            <h2>Register</h2>
+            <input 
+            type="email" 
+            placeholder="Email Address"
+            v-model="register_form.email" />
+            <input 
+                type="password" 
+                placeholder="Password" 
+                v-model="register_form.password" />
+            <input 
+                type="text" 
+                placeholder="Team Name" 
+                v-model="register_form.teamName" />
+            <input 
+                type="submit" 
+                value="Register" />
           </form>
 
           <form class="login" @submit.prevent="login">

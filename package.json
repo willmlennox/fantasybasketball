@@ -9,7 +9,10 @@
   },
   "dependencies": {
     "core-js": "^3.6.5",
+    "dns": "^0.2.2",
     "firebase": "^9.6.6",
+    "firebase-admin": "^10.0.2",
+    "http2": "^3.3.7",
     "vue": "^3.0.0",
     "vue-router": "^4.0.0-0",
     "vuex": "^4.0.0-0"
