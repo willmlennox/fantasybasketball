@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { getFirestore, collection, addDoc, onSnapshot, query, where, doc, updateDoc } from 'firebase/firestore';
+import { getFirestore, collection, addDoc, onSnapshot, query, where, doc, updateDoc, getDoc } from 'firebase/firestore';
 import { getAuth } from "firebase/auth";
 import { ref, onUnmounted } from 'vue'
 
@@ -45,6 +45,23 @@ const getPlayers = () => {
   return players;
 };
 
+const getTeam = async (email) => {
+  const q = query(teamsCollection, where("Email", "==", email));
+  const doc = await getDoc(q);
+  return doc.data().team;
+};
+
+const getTeamPlayers = (email) => {
+  const players = ref([]);
+  const team = getTeam(email);
+  const q = query(playersCollection, where("Team", "==", team))
+  const close = onSnapshot(q, snapshot => {
+    players.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+  });
+  onUnmounted(close);
+  return players;
+};
+
 const getUndraftedPlayers = () => {
   const players = ref([]);
   const q = query(playersCollection, where("Team", "==", ""))
@@ -64,4 +81,5 @@ export { auth,
         getPlayers,
         getUndraftedPlayers,
         draftPlayer,
+        getTeamPlayers,
       }

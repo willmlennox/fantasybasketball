@@ -14,19 +14,31 @@
                 </tr>
             </tbody>
         </table>
+        <br>
+        <table class="table m-0">
+            <tbody>
+                <tr v-for="{ id, Gender, Height, Position } in yourTeam" :key="id">
+                    <td>{{ id }}</td>
+                    <td>{{ Gender }}</td>
+                    <td>{{ Height }}</td>
+                    <td>{{ Position }}</td>
+                </tr>
+            </tbody>
+        </table>
     </div>
   </main>
 </template>
 
 <script>
-import { auth, getUndraftedPlayers, draftPlayer } from '../firebase'
+import { auth, getUndraftedPlayers, getTeamPlayers, draftPlayer } from '../firebase'
 
 export default {
 
     setup () {
         const user = auth.currentUser;
         const players = getUndraftedPlayers();
-        return { user, players, draftPlayer };
+        const yourTeam = getTeamPlayers(user.email);
+        return { user, players, yourTeam, draftPlayer };
     }
 
 }
