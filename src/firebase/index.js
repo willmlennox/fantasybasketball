@@ -51,9 +51,8 @@ const getTeam = async (email) => {
   return doc.data().team;
 };
 
-const getTeamPlayers = (email) => {
+const getTeamPlayers = (team) => {
   const players = ref([]);
-  const team = getTeam(email);
   const q = query(playersCollection, where("Team", "==", team))
   const close = onSnapshot(q, snapshot => {
     players.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
@@ -82,4 +81,5 @@ export { auth,
         getUndraftedPlayers,
         draftPlayer,
         getTeamPlayers,
+        getTeam,
       }

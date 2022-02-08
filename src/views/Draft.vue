@@ -30,14 +30,15 @@
 </template>
 
 <script>
-import { auth, getUndraftedPlayers, getTeamPlayers, draftPlayer } from '../firebase'
+import { auth, getUndraftedPlayers, getTeamPlayers, getTeam, draftPlayer } from '../firebase'
 
 export default {
 
     setup () {
         const user = auth.currentUser;
         const players = getUndraftedPlayers();
-        const yourTeam = getTeamPlayers(user.email);
+        const teamName = getTeam(user.email);
+        const yourTeam = getTeamPlayers(teamName);
         return { user, players, yourTeam, draftPlayer };
     }
 
