@@ -1,7 +1,6 @@
 import { createStore } from 'vuex'
 import router from '../router'
-import { auth, db } from '../firebase'
-import { collection, addDoc } from "firebase/firestore"; 
+import { auth, createTeam } from '../firebase'
 import { createUserWithEmailAndPassword, 
         signInWithEmailAndPassword,
         signOut } from 'firebase/auth'
@@ -76,17 +75,7 @@ export default createStore({
 
       commit('SET_USER', auth.currentUser)
 
-      try {
-        const docRef = await addDoc(collection(db, "Teams"), {
-          TeamName: teamName,
-          Players: [],
-          Email: email,
-        });
-
-        console.log("Document written with ID: ", docRef.id);
-      } catch (e) {
-        console.error("Error adding document: ", e);
-      }
+      createTeam(teamName, email);
 
       router.push('/')
     },

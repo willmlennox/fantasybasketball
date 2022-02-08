@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { getFirestore } from 'firebase/firestore';
+import { getFirestore, collection, addDoc } from 'firebase/firestore';
 import { getAuth } from "firebase/auth";
 
 const firebaseConfig = {
@@ -14,7 +14,31 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore();
-
 const auth = getAuth(app);
 
-export { auth, db }
+// Firestore functions
+const createTeam = async (teamName, email) => {
+  try {
+    const docRef = await addDoc(collection(db, "Teams"), {
+      TeamName: teamName,
+      Players: [],
+      Email: email,
+    });
+
+    console.log("Document written with ID: ", docRef.id);
+  } catch (e) {
+    console.error("Error adding document: ", e);
+  }
+
+};
+
+const getPlayers = async () => {
+  const players = await collection('Players').get();
+
+  return players;
+};
+
+export { auth, 
+        createTeam,
+        getPlayers,
+      }
