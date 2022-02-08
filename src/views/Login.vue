@@ -1,7 +1,7 @@
 <template>
   <main class="login">
       <div>
-          <h1>WELCOME TO MIKE BASKETBALL FANTASY</h1>
+          <h1 class="welcome_text">🏀 🏀 🏀  Mike Basketball Team Fantasy  🏀 🏀 🏀</h1>
           <img id="rotating_pic" src="../assets/home5.jpg" class="rotating_pic" alt="">
 
       <sections class="forms">
@@ -91,14 +91,14 @@ export default {
         play_intro_song() {
             var intro_song = new Audio("../assets/song.mp3");
             intro_song.volume = 0.5;
-            console.log("hi")
+            //console.log("hi")
             //intro_song.play();
         }
 
     },
 
     created() {
-        window.addEventListener('scroll', this.play_intro_song);
+        //window.addEventListener('scroll', this.play_intro_song);
     }
 }
 </script>
@@ -114,11 +114,11 @@ form {
 }
 form.register {
 	color: #FFF;
-	background-color: rgb(245, 66, 101);
+	background-color: rgb(140, 18, 165);
 	background-image: linear-gradient(
 		to bottom right,
-		rgb(245, 66, 101) 0%,
-		rgb(189, 28, 60) 100%
+		rgb(140, 18, 165) 0%,
+		rgb(73, 6, 87) 100%
 	);
 }
 h2 {
@@ -154,11 +154,11 @@ form.register input:not([type="submit"]) {
 	border-bottom: 2px solid #FFF;
 }
 form.login input:not([type="submit"]) {
-	color: #2c3e50;
-	border-bottom: 2px solid #2c3e50;
+	color: rgb(140, 18, 165);
+	border-bottom: 2px solid rgb(140, 18, 165);
 }
 form.login input[type="submit"] {
-	background-color: rgb(245, 66, 101);
+	background-color: rgb(140, 18, 165);
 	color: #FFF;
 	font-weight: 700;
 	padding: 1rem 2rem;
@@ -168,12 +168,15 @@ form.login input[type="submit"] {
 }
 form.register input[type="submit"] {
 	background-color: #FFF;
-	color: rgb(245, 66, 101);
+	color: rgb(140, 18, 165);
 	font-weight: 700;
 	padding: 1rem 2rem;
 	border-radius: 0.5rem;
 	cursor: pointer;
 	text-transform: uppercase;
+}
+form.login h2 {
+    color: rgb(140, 18, 165);
 }
 .rotating_pic {
     width: 400px;
