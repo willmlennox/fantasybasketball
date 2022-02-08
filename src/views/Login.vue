@@ -1,13 +1,19 @@
 <template>
   <main class="login">
-      <sections class="forms">
+      <div>
+          <h1>WELCOME TO MIKE BASKETBALL FANTASY</h1>
+          <img id="rotating_pic" src="../assets/home5.jpg" class="rotating_pic" alt="">
 
+      <sections class="forms">
           <form class="register" @submit.prevent="register">
+
+            <img id="rotating_pic" src="../assets/home3.jpg" class="rotating_pic" alt="">
             <h2>Register</h2>
             <input 
             type="email" 
             placeholder="Email Address"
             v-model="register_form.email" />
+            
             <input 
                 type="password" 
                 placeholder="Password" 
@@ -19,10 +25,18 @@
             <input 
                 type="submit" 
                 value="Register" />
+            
+            <img id="rotating_pic" src="../assets/home1.jpg" class="rotating_pic" alt="">
+           
+
           </form>
 
           <form class="login" @submit.prevent="login">
+              
+               <img id="rotating_pic" src="../assets/home2.jpg" class="rotating_pic" alt="">
               <h2>Login</h2>
+              <br>
+                <br>
               <input 
                 type="email" 
                 placeholder="Email Address"
@@ -31,12 +45,18 @@
                     type="password" 
                     placeholder="Password" 
                     v-model="login_form.password" />
+                    <br>
+                    <br>
                 <input 
                     type="submit" 
                     value="Login" />
+                <img id="rotating_pic" src="../assets/home4.jpg" class="rotating_pic" alt="">
           </form>
-
+        
       </sections>
+
+      </div>
+
   </main>
 </template>
 
@@ -64,8 +84,22 @@ export default {
             login,
             register
         }
-    }
+    },
 
+    methods: {
+
+        play_intro_song() {
+            var intro_song = new Audio("../assets/song.mp3");
+            intro_song.volume = 0.5;
+            console.log("hi")
+            //intro_song.play();
+        }
+
+    },
+
+    created() {
+        window.addEventListener('scroll', this.play_intro_song);
+    }
 }
 </script>
 
@@ -140,5 +174,9 @@ form.register input[type="submit"] {
 	border-radius: 0.5rem;
 	cursor: pointer;
 	text-transform: uppercase;
+}
+.rotating_pic {
+    width: 400px;
+    height: 200px;
 }
 </style>
