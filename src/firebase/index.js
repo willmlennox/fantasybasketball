@@ -1,6 +1,7 @@
 import { initializeApp } from "firebase/app";
-import { getFirestore, collection, addDoc } from 'firebase/firestore';
+import { getFirestore, collection, addDoc, onSnapshot, query, where, doc, updateDoc } from 'firebase/firestore';
 import { getAuth } from "firebase/auth";
+import { ref, onUnmounted } from 'vue'
 
 const firebaseConfig = {
   apiKey: "AIzaSyCTS21pRfiupsR85Lplykc4i9mm3a598tk",
@@ -16,10 +17,13 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore();
 const auth = getAuth(app);
 
+const playersCollection = collection(db, "Players");
+const teamsCollection = collection(db, "Teams");
+
 // Firestore functions
 const createTeam = async (teamName, email) => {
   try {
-    const docRef = await addDoc(collection(db, "Teams"), {
+    const docRef = await addDoc(teamsCollection, {
       TeamName: teamName,
       Players: [],
       Email: email,
@@ -32,13 +36,32 @@ const createTeam = async (teamName, email) => {
 
 };
 
-const getPlayers = async () => {
-  const players = await collection('Players').get();
-
+const getPlayers = () => {
+  const players = ref([]);
+  const close = onSnapshot(playersCollection, snapshot => {
+    players.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+  });
+  onUnmounted(close);
   return players;
 };
+
+const getUndraftedPlayers = () => {
+  const players = ref([]);
+  const q = query(playersCollection, where("Team", "==", ""))
+  const close = onSnapshot(q, snapshot => {
+    players.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+  });
+  onUnmounted(close);
+  return players;
+};
+
+const draftPlayer = async (id, team) => {
+  await updateDoc(doc(playersCollection, id), { Team: team })
+}
 
 export { auth, 
         createTeam,
         getPlayers,
+        getUndraftedPlayers,
+        draftPlayer,
       }

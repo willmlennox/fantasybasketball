@@ -3,26 +3,30 @@
     <h1>Draft</h1>
 
     <div>
-      <tbody>
-          <tr v-for="{ id, Gender, Height, Position } in players" :key="id">
-              <td>{{ id }}</td>
-              <td>{{ Gender }}</td>
-              <td>{{ Height }}</td>
-              <td>{{ Position }}</td>
-          </tr>
-      </tbody>
+        <table class="table m-0">
+            <tbody>
+                <tr v-for="{ id, Gender, Height, Position } in players" :key="id">
+                    <td>{{ id }}</td>
+                    <td>{{ Gender }}</td>
+                    <td>{{ Height }}</td>
+                    <td>{{ Position }}</td>
+                    <button class="btn" @click="draftPlayer(id, user.email)">PICK</button>
+                </tr>
+            </tbody>
+        </table>
     </div>
   </main>
 </template>
 
 <script>
-import { getPlayers } from '../firebase'
+import { auth, getUndraftedPlayers, draftPlayer } from '../firebase'
 
 export default {
 
     setup () {
-        const players = getPlayers();
-        return players;
+        const user = auth.currentUser;
+        const players = getUndraftedPlayers();
+        return { user, players, draftPlayer };
     }
 
 }
