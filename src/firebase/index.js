@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { getFirestore, collection, addDoc, onSnapshot, query, where, doc, updateDoc } from 'firebase/firestore';
+import { getFirestore, collection, addDoc, onSnapshot, query, where, doc, updateDoc, getDoc } from 'firebase/firestore';
 import { getAuth } from "firebase/auth";
 import { ref, onUnmounted } from 'vue'
 
@@ -26,7 +26,7 @@ const createTeam = async (teamName, email) => {
     const docRef = await addDoc(teamsCollection, {
       TeamName: teamName,
       Players: [],
-      Email: email,
+      id: email,
     });
 
     console.log("Document written with ID: ", docRef.id);
@@ -45,21 +45,15 @@ const getPlayers = () => {
   return players;
 };
 
-const getTeam = (email) => {
-  const doc = ref([]);
-  const q = query(teamsCollection, where("Email", "==", email));
-  const close = onSnapshot(q, snapshot => {
-    doc.value = snapshot.docs.find(doc => ({ id: doc.id, ...doc.data() }))
-  });
-  onUnmounted(close);
-  return doc.value;
+const getTeam = async (email) => {
+  const docRef = doc(teamsCollection, email);
+  const team = await getDoc(docRef);
+  return team.data().TeamName;
 };
 
 const getTeamPlayers = (email) => {
   const players = ref([]);
-  const team = getTeam(email);
-  console.log(team)
-  const q = query(playersCollection, where("Team", "==", team))
+  const q = query(playersCollection, where("Team", "==", email))
   const close = onSnapshot(q, snapshot => {
     players.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
   });
@@ -77,8 +71,8 @@ const getUndraftedPlayers = () => {
   return players;
 };
 
-const draftPlayer = async (id, team) => {
-  await updateDoc(doc(playersCollection, id), { Team: team })
+const draftPlayer = async (id, email) => {
+  await updateDoc(doc(playersCollection, id), { Team: email })
 }
 
 export { auth, 
@@ -87,4 +81,5 @@ export { auth,
         getUndraftedPlayers,
         draftPlayer,
         getTeamPlayers,
+        getTeam,
       }

@@ -38,6 +38,7 @@ export default {
         const user = auth.currentUser;
         const players = getUndraftedPlayers();
         const yourTeam = getTeamPlayers(user.email);
+        console.log(yourTeam)
         return { user, players, yourTeam, draftPlayer };
     }
 
