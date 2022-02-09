@@ -1,24 +1,40 @@
 <template>
   <main class="draft">
-    <h1>Draft</h1>
+    <h1 class="draftH">MIKE BASKETBALL TEAM FANTASY BASKETBALL DRAFT</h1>
 
-    <div>
-        <table class="table m-0">
+    <div class="container">
+        <table class="">
+            <thead>
+                <tr>
+                    <th class="playerName">PLAYER NAME</th>
+                    <th>GENDER</th>
+                    <th>HEIGHT</th>
+                    <th>POSITION</th>
+                </tr>
+            </thead>
             <tbody>
                 <tr v-for="{ id, Gender, Height, Position } in players" :key="id">
-                    <td>{{ id }}</td>
+                    <td class="playerName">{{ id }}</td>
                     <td>{{ Gender }}</td>
                     <td>{{ Height }}</td>
                     <td>{{ Position }}</td>
-                    <button class="btn" @click="draftPlayer(id, user.email)">PICK</button>
+                    <button class="draft" @click="draftPlayer(id, user.email)">PICK</button>
                 </tr>
             </tbody>
         </table>
         <br>
-        <table class="table m-0">
+        <table class="">
+            <thead>
+                <tr>
+                    <th class="playerName">PLAYER NAME</th>
+                    <th>GENDER</th>
+                    <th>HEIGHT</th>
+                    <th>POSITION</th>
+                </tr>
+            </thead>
             <tbody>
                 <tr v-for="{ id, Gender, Height, Position } in yourTeam" :key="id">
-                    <td>{{ id }}</td>
+                    <td class="playerName">{{ id }}</td>
                     <td>{{ Gender }}</td>
                     <td>{{ Height }}</td>
                     <td>{{ Position }}</td>
@@ -46,5 +62,31 @@ export default {
 </script>
 
 <style>
+.draftH {
+    padding-bottom: 5rem;
+}
 
+.container {
+    display: flex;
+}
+
+table {
+    border-collapse: collapse;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    margin: auto;
+}
+
+td, th {
+    border: 1px solid rgb(107, 104, 104);
+    padding: 0.5rem;
+    text-align: left;
+}
+
+.playerName {
+    width: 10rem;
+}
+
+.draft {
+    padding: 0.5rem;
+}
 </style>
