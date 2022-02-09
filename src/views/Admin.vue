@@ -17,20 +17,20 @@
         <table class="table m-0">
             
             <tbody>
-                <tr v-for="{id, points, rebounds, assists, steals,blocks,turnovers } in players" :key="id">
+                <tr v-for="{id, stats:{points, rebounds, assists, steals,blocks,turnovers} } in playerStats" :key="id">
                     <td>{{ id }}</td>
                     <td> Points:{{ points }}</td>
-                    <button class="btn" v-on:click="increment(id, points)">Increase Points</button>
+                    <button class="btn" v-on:click="updateStat(gameNum, id)"> Up</button>
                     <td>Rebounds{{ rebounds }}</td>
-                    <button class="btn" v-on:click="increment(id, rebounds)">Increase Rebounds</button>
+                    <button class="btn" v-on:click="updateStat(gameNum, {id, points})">Up</button>
                     <td>Assists:{{ assists }}</td>
-                    <button class="btn" v-on:click="increment(id, assists)">Increase Assists</button>
+                    <button class="btn" v-on:click="updateStat(gameNum, {id, points})">Up</button>
                     <td>Steals:{{ steals }}</td>
-                    <button class="btn" v-on:click="increment(id, steals)">Increase Steaks</button>
+                    <button class="btn" v-on:click="updateStat(gameNum, {id, points})">Up</button>
                     <td>Blocks:{{ blocks }}</td>
-                    <button class="btn" v-on:click="increment(id, blocks)">Increase Blocks</button>
+                    <button class="btn" v-on:click="updateStat(gameNum, {id, points})">Up</button>
                     <td>Turnovers:{{ turnovers }}</td>
-                    <button class="btn" v-on:click="increment(id, turnovers)">Increase Turnovers</button>
+                    <button class="btn" v-on:click="updateStat(gameNum, {id, points})">Up</button>
                 </tr>
             </tbody>
         </table>
@@ -40,22 +40,27 @@
 </template>
 <script>
 
-import { auth, getPlayerNames, createGame} from '../firebase'
+import { auth, getPlayerNames, createGame, updateStat, getPlayerStats} from '../firebase'
 import { ref } from 'vue';
 
 export default {
     setup () {
         const user = auth.currentUser;
         const players = getPlayerNames();
+        
         const gameNum = ref({});
+        const playerStats = getPlayerStats(gameNum);
 
         return {
             players,
             user,
             gameNum,
-            createGame
+            playerStats,
+            createGame,
+            updateStat
         };
     },
+    
     
 }
 </script>

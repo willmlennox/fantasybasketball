@@ -38,18 +38,13 @@ const createGame = async (gameNum, players) => {
 
   let text = gameNum.toString();
   const gamesRef = doc(gamesCollection, text);
+  let stats = ref(players).value;
 
-  
-  //for (var i = 0; i < ref(players).value.length; i++) {
-    let playerName = ref(players).value.id;
-    console.log(playerName);
-    let stats = ref(players).value;
+  await setDoc(gamesRef, {
+    stats,
+  });
+
     
-    await setDoc(gamesRef, {
-      playerName:stats,
-    });
-    
-  //}
 
 }
 
@@ -63,19 +58,27 @@ const getPlayers = () => {
 };
 
 
-const getPlayerStats = () => {
-  const players = ref([]);
-  const close = onSnapshot(gamesCollection, snapshot => {
-    players.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
-  });
-  onUnmounted(close);
-  return players;
+const getPlayerStats = async (gameNum) => {
+  //const players = ref([]);
+  let text = gameNum.toString();
+  console.log(text);
+  const docRef = doc(gamesCollection, text);
+  const players = await getDoc(docRef);
+
+  if (players.exists()) {
+    console.log("sdklasd");
+    console.log("Document data:", players.data());
+  } else {
+    // doc.data() will be undefined in this case
+    console.log("No such document!");
+  }
+  return players.data();
 };
 
 const getPlayerNames = () => {
   const players = ref([]);
   const close = onSnapshot(playersCollection, snapshot => {
-    players.value = snapshot.docs.map(doc => ({ id: doc.id, points:0,rebounds:0, assists:0,steals:0, blocks:0, turnovers:0 }))
+    players.value = snapshot.docs.map(doc => ({ id:doc.id, stats: {points:0,rebounds:0, assists:0,steals:0, blocks:0, turnovers:0 }}))
   });
   onUnmounted(close);
   return players;
@@ -111,6 +114,14 @@ const draftPlayer = async (id, email) => {
   await updateDoc(doc(playersCollection, id), { Team: email })
 }
 
+const updateStat = async (gameNum, players) => {
+  let stats = ref(players).value;
+
+  await updateDoc(doc(gamesCollection, gameNum),{
+    stats,
+  });
+}
+
 export { auth, 
         createTeam,
         createGame,
@@ -121,4 +132,5 @@ export { auth,
         draftPlayer,
         getTeamPlayers,
         getTeam,
+        updateStat
       }
