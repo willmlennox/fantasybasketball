@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { getFirestore, collection, addDoc, onSnapshot, query, where, doc, updateDoc, getDoc } from 'firebase/firestore';
+import { getFirestore, collection, onSnapshot,setDoc, query, where, doc, updateDoc, getDoc } from 'firebase/firestore';
 import { getAuth } from "firebase/auth";
 import { ref, onUnmounted } from 'vue'
 
@@ -19,27 +19,63 @@ const auth = getAuth(app);
 
 const playersCollection = collection(db, "Players");
 const teamsCollection = collection(db, "Teams");
+const gamesCollection = collection(db, "Games");
 
 // Firestore functions
 const createTeam = async (teamName, email) => {
-  try {
-    const docRef = await addDoc(teamsCollection, {
-      TeamName: teamName,
-      Players: [],
-      id: email,
-    });
 
-    console.log("Document written with ID: ", docRef.id);
-  } catch (e) {
-    console.error("Error adding document: ", e);
-  }
+  const docRef = doc(teamsCollection, email);
+
+  await setDoc(docRef, {
+    TeamName: teamName,
+    Players: [],
+    id: email,
+  });
 
 };
+
+const createGame = async (gameNum, players) => {
+
+  let text = gameNum.toString();
+  const gamesRef = doc(gamesCollection, text);
+
+  
+  //for (var i = 0; i < ref(players).value.length; i++) {
+    let playerName = ref(players).value.id;
+    console.log(playerName);
+    let stats = ref(players).value;
+    
+    await setDoc(gamesRef, {
+      playerName:stats,
+    });
+    
+  //}
+
+}
 
 const getPlayers = () => {
   const players = ref([]);
   const close = onSnapshot(playersCollection, snapshot => {
     players.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+  });
+  onUnmounted(close);
+  return players;
+};
+
+
+const getPlayerStats = () => {
+  const players = ref([]);
+  const close = onSnapshot(gamesCollection, snapshot => {
+    players.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+  });
+  onUnmounted(close);
+  return players;
+};
+
+const getPlayerNames = () => {
+  const players = ref([]);
+  const close = onSnapshot(playersCollection, snapshot => {
+    players.value = snapshot.docs.map(doc => ({ id: doc.id, points:0,rebounds:0, assists:0,steals:0, blocks:0, turnovers:0 }))
   });
   onUnmounted(close);
   return players;
@@ -77,7 +113,10 @@ const draftPlayer = async (id, email) => {
 
 export { auth, 
         createTeam,
+        createGame,
         getPlayers,
+        getPlayerStats,
+        getPlayerNames,
         getUndraftedPlayers,
         draftPlayer,
         getTeamPlayers,
