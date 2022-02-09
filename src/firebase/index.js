@@ -34,15 +34,22 @@ const createTeam = async (teamName, email) => {
 
 };
 
-const createGame = async (gameNum) => {
-  let text = gameNum.toString();
-  const gamesRef = doc(gamesCollection, text)
+const createGame = async (gameNum, players) => {
 
-  await setDoc(gamesRef, {
+  let text = gameNum.toString();
+  const gamesRef = doc(gamesCollection, text);
+
+  
+  //for (var i = 0; i < ref(players).value.length; i++) {
+    let playerName = ref(players).value.id;
+    console.log(playerName);
+    let stats = ref(players).value;
     
-    Game: gameNum,
-    test: "fdjsk",
-  });
+    await setDoc(gamesRef, {
+      playerName:stats,
+    });
+    
+  //}
 
 }
 
@@ -55,7 +62,17 @@ const getPlayers = () => {
   return players;
 };
 
-const getBasePlayerStats = () => {
+
+const getPlayerStats = () => {
+  const players = ref([]);
+  const close = onSnapshot(gamesCollection, snapshot => {
+    players.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+  });
+  onUnmounted(close);
+  return players;
+};
+
+const getPlayerNames = () => {
   const players = ref([]);
   const close = onSnapshot(playersCollection, snapshot => {
     players.value = snapshot.docs.map(doc => ({ id: doc.id, points:0,rebounds:0, assists:0,steals:0, blocks:0, turnovers:0 }))
@@ -98,7 +115,8 @@ export { auth,
         createTeam,
         createGame,
         getPlayers,
-        getBasePlayerStats,
+        getPlayerStats,
+        getPlayerNames,
         getUndraftedPlayers,
         draftPlayer,
         getTeamPlayers,

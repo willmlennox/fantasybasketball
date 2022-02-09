@@ -12,25 +12,25 @@
                 v-model="gameNum"
                 type="number" 
                 placeholder="1" />
-                <button class="btn" @click="createGame(gameNum, players,)">Create Game BEFORE adding stats.</button>
+                <button class="btn" @click="createGame(gameNum,players)">Create Game BEFORE adding stats.</button>
                 </form>
         <table class="table m-0">
             
             <tbody>
                 <tr v-for="{id, points, rebounds, assists, steals,blocks,turnovers } in players" :key="id">
                     <td>{{ id }}</td>
-                    <td>{{ points }}</td>
-                    <button class="btn" v-on:click="increment(id, points)">Increase</button>
-                    <td>{{ rebounds }}</td>
-                    <button class="btn" v-on:click="increment(id, rebounds)">Increase</button>
-                    <td>{{ assists }}</td>
-                    <button class="btn" v-on:click="increment(id, assists)">Increase</button>
-                    <td>{{ steals }}</td>
-                    <button class="btn" v-on:click="increment(id, steals)">Increase</button>
-                    <td>{{ blocks }}</td>
-                    <button class="btn" v-on:click="increment(id, blocks)">Increase</button>
-                    <td>{{ turnovers }}</td>
-                    <button class="btn" v-on:click="increment(id, turnovers)">Increase</button>
+                    <td> Points:{{ points }}</td>
+                    <button class="btn" v-on:click="increment(id, points)">Increase Points</button>
+                    <td>Rebounds{{ rebounds }}</td>
+                    <button class="btn" v-on:click="increment(id, rebounds)">Increase Rebounds</button>
+                    <td>Assists:{{ assists }}</td>
+                    <button class="btn" v-on:click="increment(id, assists)">Increase Assists</button>
+                    <td>Steals:{{ steals }}</td>
+                    <button class="btn" v-on:click="increment(id, steals)">Increase Steaks</button>
+                    <td>Blocks:{{ blocks }}</td>
+                    <button class="btn" v-on:click="increment(id, blocks)">Increase Blocks</button>
+                    <td>Turnovers:{{ turnovers }}</td>
+                    <button class="btn" v-on:click="increment(id, turnovers)">Increase Turnovers</button>
                 </tr>
             </tbody>
         </table>
@@ -40,13 +40,13 @@
 </template>
 <script>
 
-import { auth, getBasePlayerStats, createGame} from '../firebase'
+import { auth, getPlayerNames, createGame} from '../firebase'
 import { ref } from 'vue';
 
 export default {
     setup () {
         const user = auth.currentUser;
-        const players = getBasePlayerStats();
+        const players = getPlayerNames();
         const gameNum = ref({});
 
         return {
