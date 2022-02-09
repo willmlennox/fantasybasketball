@@ -18,7 +18,7 @@
                     <td>{{ Gender }}</td>
                     <td>{{ Height }}</td>
                     <td>{{ Position }}</td>
-                    <button class="draft" v-on:click="drafted(id)" @click="draftPlayer(id, user.email)">PICK</button>
+                    <button class="draft" @click="draftPlayer(id, user.email)">PICK</button>
                 </tr>
             </tbody>
         </table>
@@ -41,13 +41,13 @@
                 </tr>
             </tbody>
         </table>
-        <a>{{ lastDrafted }}</a>
+        <a v-for="{ id, Team } in lastDrafted" :key="id">{{ id }} was drafted by {{ Team }}.</a>
     </div>
   </main>
 </template>
 
 <script>
-import { auth, getUndraftedPlayers, getTeamPlayers, draftPlayer, getTeam } from '../firebase'
+import { auth, getUndraftedPlayers, getTeamPlayers, draftPlayer, getLastDraftedPlayer } from '../firebase'
 
 export default {
 
@@ -56,14 +56,7 @@ export default {
         const players = getUndraftedPlayers();
         const yourTeam = getTeamPlayers(user.email);
 
-        var team = getTeam(auth.currentUser.email).then((response) => {
-            team = response;
-        })
-        var lastDraftedPlayer = getLastDraftedPlayer().then((response) => {
-            lastDraftedPlayer = response;
-        })
-
-        const lastDrafted = lastDraftedPlayer + " was drafted by " + team + ".";
+        const lastDrafted = getLastDraftedPlayer();
 
         return { user, players, yourTeam, lastDrafted, draftPlayer };
     }

@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { getFirestore, collection, onSnapshot,setDoc, query, where, doc, updateDoc, getDoc } from 'firebase/firestore';
+import { getFirestore, collection, onSnapshot,setDoc, query, where, doc, updateDoc, getDoc, orderBy, limit } from 'firebase/firestore';
 import { getAuth } from "firebase/auth";
 import { ref, onUnmounted } from 'vue'
 
@@ -20,6 +20,7 @@ const auth = getAuth(app);
 const playersCollection = collection(db, "Players");
 const teamsCollection = collection(db, "Teams");
 const gamesCollection = collection(db, "Games");
+const draftCollection = collection(db, "Draft");
 
 // Firestore functions
 const createTeam = async (teamName, email) => {
@@ -29,7 +30,6 @@ const createTeam = async (teamName, email) => {
   await setDoc(docRef, {
     TeamName: teamName,
     Players: [],
-    id: email,
   });
 
 };
@@ -112,6 +112,30 @@ const getUndraftedPlayers = () => {
 
 const draftPlayer = async (id, email) => {
   await updateDoc(doc(playersCollection, id), { Team: email })
+  const docRef = doc(draftCollection, id);
+  var currPos = doc(draftCollection, "DraftPosition");
+  const cur = await getDoc(currPos);
+  var num = cur.data().CurrentPos;
+  num += 1;
+  await updateDoc(doc(draftCollection, "DraftPosition"), { CurrentPos: num })
+
+  getTeam(email).then(async response => {
+    await setDoc(docRef, {
+      Team: response,
+      DraftPos: num,
+    });
+  });
+  
+}
+
+const getLastDraftedPlayer = () => {
+  const players = ref([]);
+  const q = query(draftCollection, orderBy("DraftPos", "desc"), limit(1));
+  const close = onSnapshot(q, snapshot => {
+    players.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+  });
+  onUnmounted(close);
+  return players;
 }
 
 const updateStat = async (gameNum, players) => {
@@ -132,5 +156,6 @@ export { auth,
         draftPlayer,
         getTeamPlayers,
         getTeam,
-        updateStat
+        updateStat,
+        getLastDraftedPlayer,
       }
