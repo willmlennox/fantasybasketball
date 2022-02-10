@@ -90,6 +90,16 @@ const getTeam = async (email) => {
   return team.data().TeamName;
 };
 
+const getAllTeams = () => {
+  const teams = ref([]);
+  const q = query(teamsCollection)
+  const close = onSnapshot(q, snapshot => {
+    teams.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+  });
+  onUnmounted(close);
+  return teams;
+}
+
 const getTeamPlayers = (email) => {
   const players = ref([]);
   const q = query(playersCollection, where("Team", "==", email))
@@ -112,19 +122,34 @@ const getUndraftedPlayers = () => {
 
 const draftPlayer = async (id, email) => {
   await updateDoc(doc(playersCollection, id), { Team: email })
-  const docRef = doc(draftCollection, id);
+
+  // Update draft collection pointer
   var currPos = doc(draftCollection, "DraftPosition");
   const cur = await getDoc(currPos);
   var num = cur.data().CurrentPos;
   num += 1;
   await updateDoc(doc(draftCollection, "DraftPosition"), { CurrentPos: num })
 
+  // Update draft collection player
+  const docRef = doc(draftCollection, id);
   getTeam(email).then(async response => {
     await setDoc(docRef, {
       Team: response,
       DraftPos: num,
     });
+
+  // Update team's player list
+  const teamRef = doc(teamsCollection, email);
+  const team = await getDoc(teamRef);
+
+  const players = team.data().Players;
+  players.push(id);
+  await updateDoc(doc(teamsCollection, email), { Players: players })
+
+
   });
+
+
   
 }
 
@@ -158,4 +183,5 @@ export { auth,
         getTeam,
         updateStat,
         getLastDraftedPlayer,
+        getAllTeams,
       }
