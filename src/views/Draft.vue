@@ -2,6 +2,8 @@
   <main class="draft">
     <h1 class="draftH">MIKE BASKETBALL TEAM FANTASY BASKETBALL DRAFT</h1>
 
+    <button class="draftBtn" v-if=" user.email == 'will@will.com' " @click="createDraftOrder()">CREATE DRAFT ORDER</button>
+
     <div class="lastDraftedDiv">
         <a v-for="{ id, Team } in lastDrafted" :key="id">{{ id }} was drafted by {{ Team }}.</a>
     </div>
@@ -27,7 +29,9 @@
                         <td>{{ Gender }}</td>
                         <td>{{ Height }}</td>
                         <td>{{ Position }}</td>
-                        <button class="draftBtn" @click="draftPlayer(id, user.email)">DRAFT</button>
+                        <div v-for="team in currentTeam" :key="team">
+                            <button class="draftBtn" v-if=" team.CurrentTeam == user.email " @click="draftPlayer(id, user.email)">DRAFT</button>
+                        </div>
                     </tr>
                 </tbody>
             </table>    
@@ -62,7 +66,7 @@
 </template>
 
 <script>
-import { auth, getUndraftedPlayers, getTeamPlayers, draftPlayer, getLastDraftedPlayer, getAllTeams } from '../firebase'
+import { auth, getUndraftedPlayers, getTeamPlayers, draftPlayer, getLastDraftedPlayer, getAllTeams, getCurrentDraftTeam, createDraftOrder } from '../firebase'
 
 export default {
 
@@ -71,10 +75,12 @@ export default {
         const players = getUndraftedPlayers();
         const teams = getAllTeams();
         const yourTeam = getTeamPlayers(user.email);
+        const currentTeam = getCurrentDraftTeam();
+        console.log(currentTeam);
 
         const lastDrafted = getLastDraftedPlayer();
 
-        return { user, players, yourTeam, teams, lastDrafted, draftPlayer };
+        return { user, players, yourTeam, teams, lastDrafted, currentTeam, draftPlayer, createDraftOrder };
     }
 
 }

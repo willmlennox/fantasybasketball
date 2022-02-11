@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { getFirestore, collection, onSnapshot,setDoc, query, where, doc, updateDoc, getDoc, orderBy, limit } from 'firebase/firestore';
+import { getFirestore, collection, onSnapshot,setDoc, query, where, doc, updateDoc, getDoc, getDocs, orderBy, limit } from 'firebase/firestore';
 import { getAuth } from "firebase/auth";
 import { ref, onUnmounted } from 'vue'
 
@@ -29,7 +29,9 @@ const createTeam = async (teamName, email) => {
 
   await setDoc(docRef, {
     TeamName: teamName,
-    Players: [],
+    M: "",
+    F: "",
+    UTIL: "",
   });
 
 };
@@ -120,15 +122,56 @@ const getUndraftedPlayers = () => {
   return players;
 };
 
+const getCurrentDraftTeam = () => {
+  const team = ref([]);
+  const q = query(draftCollection, where("CurrentPos", ">=", 0))
+  const close = onSnapshot(q, snapshot => {
+    team.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+  });
+  onUnmounted(close);
+  return team;
+}
+
 const draftPlayer = async (id, email) => {
+
+  // Update team's player list
+  const teamRef = doc(teamsCollection, email);
+  const team = await getDoc(teamRef);
+
+  const playerRef = doc(playersCollection, id);
+  const player = await getDoc(playerRef);
+
+  const m = team.data().M;
+  const f = team.data().F;
+  const util = team.data().UTIL;
+  const g = player.data().Gender;
+
+  if(g == "M") {
+    if(m == ""){
+      await updateDoc(doc(teamsCollection, email), { M: id });
+    } else if (util == "") {
+      await updateDoc(doc(teamsCollection, email), { UTIL: id });
+    } else {
+      return alert("Cannot draft " + id + ". Male and util spots are full on your team.");
+    }
+  } else {
+    if(f == ""){
+      await updateDoc(doc(teamsCollection, email), { F: id });
+    } else if (util == "") {
+      await updateDoc(doc(teamsCollection, email), { UTIL: id });
+    } else {
+      return alert("Cannot draft " + id + ". Female and util spots are full on your team.");
+    }
+  }
+  
+  
+
   await updateDoc(doc(playersCollection, id), { Team: email })
 
   // Update draft collection pointer
   var currPos = doc(draftCollection, "DraftPosition");
   const cur = await getDoc(currPos);
   var num = cur.data().CurrentPos;
-  num += 1;
-  await updateDoc(doc(draftCollection, "DraftPosition"), { CurrentPos: num })
 
   // Update draft collection player
   const docRef = doc(draftCollection, id);
@@ -138,19 +181,67 @@ const draftPlayer = async (id, email) => {
       DraftPos: num,
     });
 
-  // Update team's player list
-  const teamRef = doc(teamsCollection, email);
-  const team = await getDoc(teamRef);
+  num += 1;
+  await updateDoc(doc(draftCollection, "DraftPosition"), { CurrentPos: num })
 
-  const players = team.data().Players;
-  players.push(id);
-  await updateDoc(doc(teamsCollection, email), { Players: players })
-
+  // Update current team drafting
+  var orderRef = doc(draftCollection, "DraftOrder");
+  const order = await getDoc(orderRef);
+  const curTeam = order.data()[num];
+  await updateDoc(doc(draftCollection, "DraftPosition"), { CurrentTeam: curTeam })
 
   });
+}
 
+const createDraftOrder = async () => {
+  var c = 0;
+  var order = 1;
+  var desc = false;
+  var maxTeamSize = 3;
+  var teams = [];
 
-  
+  console.log(order);
+
+  const teamDocs = await getDocs(teamsCollection);
+  teamDocs.forEach((doc) => {
+    teams.push(doc.id)
+  })
+
+  // shuffle array
+  for (let i = teams.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [teams[i], teams[j]] = [teams[j], teams[i]];
+  }
+
+  for (let i = 0; i < maxTeamSize; i++) {
+    teamDocs.forEach(() => {
+      updateDoc(doc(draftCollection, "DraftOrder"), { [order]: teams[c] })
+      if (!desc) {
+        c++;
+      } else {
+        c--;
+      } if (c==-1 && desc) {
+        desc = false;
+        c++;
+      } else if (c==teams.length && !desc) {
+        desc = true;
+        c--;
+      }
+      order++;
+    })
+  }
+
+  // Get current draft number
+  var currPos = doc(draftCollection, "DraftPosition");
+  const cur = await getDoc(currPos);
+  var num = cur.data().CurrentPos;
+
+  // Update current team drafting
+  var orderRef = doc(draftCollection, "DraftOrder");
+  const draftOrder = await getDoc(orderRef);
+  const curTeam = draftOrder.data()[num];
+  await updateDoc(doc(draftCollection, "DraftPosition"), { CurrentTeam: curTeam })
+
 }
 
 const getLastDraftedPlayer = () => {
@@ -184,4 +275,6 @@ export { auth,
         updateStat,
         getLastDraftedPlayer,
         getAllTeams,
+        getCurrentDraftTeam,
+        createDraftOrder,
       }
