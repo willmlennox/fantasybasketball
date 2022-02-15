@@ -102,6 +102,56 @@ const getAllTeams = () => {
   return teams;
 }
 
+const listTeams = () => {
+
+  const teamList = ref([]);
+  var playerList = [];
+  var dList = [];
+  var d = {};
+
+  const close2 = onSnapshot(playersCollection, players => {
+    players.forEach((doc) => {
+      playerList.push(doc);
+    });
+  });
+
+  const q = query(teamsCollection)
+  const close = onSnapshot(q, teams => {
+    dList = [];
+    teams.forEach(value => {
+
+      d = {
+        "teamName": null,
+        "M": null,
+        "F": null,
+        "UTIL": null,
+      };
+      
+      d["teamName"] = value.data().TeamName;
+  
+      playerList.forEach((doc) => {
+        if (doc.id == value.data().M) {
+          d["M"] = doc.data();
+          d["M"]["id"] = doc.id;
+        } else if (doc.id == value.data().F) {
+          d["F"] = doc.data();
+          d["F"]["id"] = doc.id;
+        } else if (doc.id == value.data().UTIL) {
+          d["UTIL"] = doc.data();
+          d["UTIL"]["id"] = doc.id;
+        }
+      });
+      dList.push(d);
+    });
+    teamList.value = dList;
+  });
+
+  onUnmounted(close);
+  onUnmounted(close2);
+
+  return teamList;
+}
+
 const getTeamPlayers = (email) => {
   const players = ref([]);
   const q = query(playersCollection, where("Team", "==", email))
@@ -277,4 +327,5 @@ export { auth,
         getAllTeams,
         getCurrentDraftTeam,
         createDraftOrder,
+        listTeams,
       }

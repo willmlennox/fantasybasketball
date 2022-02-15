@@ -38,50 +38,67 @@
         </div>
         
         <div class="column2">
-            <h1>YOUR TEAM</h1>
-            <table class="">
-                <thead>
-                    <tr>
-                        <th class="empty"></th>
-                        <th class="playerName">PLAYER NAME</th>
-                        <th>GENDER</th>
-                        <th>HEIGHT</th>
-                        <th>POSITION</th>
-                        <th class="empty"></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="{ id, Gender, Height, Position, Photo } in yourTeam" :key="id">
-                        <img :src="require(`../assets/${Photo}`)">
-                        <td class="playerName">{{ id }}</td>
-                        <td>{{ Gender }}</td>
-                        <td>{{ Height }}</td>
-                        <td>{{ Position }}</td>
-                    </tr>
-                </tbody>
-            </table>
+            <div v-for="{ teamName, M, F, UTIL } in teams" :key="teamName">
+                <h1 style="margin-bottom: 1rem">{{ teamName }}</h1>
+                <table class="teamList">
+                    <thead>
+                        <tr>
+                            <th class="empty"></th>
+                            <th class="playerName">PLAYER NAME</th>
+                            <th>GENDER</th>
+                            <th>HEIGHT</th>
+                            <th>POSITION</th>
+                            <th class="empty"></th>
+                            <th class="empty"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-if="M">
+                            <img :src="require(`../assets/${M.Photo}`)">
+                            <td class="playerName">{{ M.id }}</td>
+                            <td>{{ M.Gender }}</td>
+                            <td>{{ M.Height }}</td>
+                            <td>{{ M.Position }}</td>
+                            <td>M</td>
+                        </tr>
+                        <tr v-if="F">
+                            <img :src="require(`../assets/${F.Photo}`)">
+                            <td class="playerName">{{ F.id }}</td>
+                            <td>{{ F.Gender }}</td>
+                            <td>{{ F.Height }}</td>
+                            <td>{{ F.Position }}</td>
+                            <td>F</td>
+                        </tr>
+                        <tr v-if="UTIL">
+                            <img :src="require(`../assets/${UTIL.Photo}`)">
+                            <td class="playerName">{{ UTIL.id }}</td>
+                            <td>{{ UTIL.Gender }}</td>
+                            <td>{{ UTIL.Height }}</td>
+                            <td>{{ UTIL.Position }}</td>
+                            <td>UTIL</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
   </main>
 </template>
 
 <script>
-import { auth, getUndraftedPlayers, getTeamPlayers, draftPlayer, getLastDraftedPlayer, getAllTeams, getCurrentDraftTeam, createDraftOrder } from '../firebase'
+import { auth, getUndraftedPlayers, draftPlayer, getLastDraftedPlayer, getCurrentDraftTeam, createDraftOrder, listTeams } from '../firebase'
 
 export default {
 
     setup () {
         const user = auth.currentUser;
         const players = getUndraftedPlayers();
-        const teams = getAllTeams();
-        const yourTeam = getTeamPlayers(user.email);
         const currentTeam = getCurrentDraftTeam();
-        console.log(currentTeam);
-
         const lastDrafted = getLastDraftedPlayer();
+        const teams = listTeams();
 
-        return { user, players, yourTeam, teams, lastDrafted, currentTeam, draftPlayer, createDraftOrder };
-    }
+        return { user, players, teams, lastDrafted, currentTeam, draftPlayer, createDraftOrder };
+    },
 
 }
 </script>
@@ -175,6 +192,10 @@ td, th {
     padding-right: 2rem;
     width: 50%;
     float: left;
+}
+
+.teamList {
+    margin-bottom: 5rem;
 }
 
 img {
