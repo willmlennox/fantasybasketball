@@ -23,6 +23,11 @@
                 placeholder="Team Name" 
                 v-model="register_form.teamName" />
             <input 
+                type="checkbox" 
+                value="team"
+                unchecked
+                v-model="register_form.team" /> ARE YOU A TEAM? <br><br>
+            <input 
                 type="submit" 
                 value="Register" />
             
@@ -126,7 +131,7 @@ h2 {
 	text-transform: uppercase;
 	margin-bottom: 2rem;
 }
-input {
+input:not([type="checkbox"]) {
 	appearance: none;
 	border: none;
 	outline: none;

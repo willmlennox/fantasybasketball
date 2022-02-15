@@ -48,7 +48,7 @@ export default createStore({
     },
 
     async register ({ commit }, details) {
-      const { email, password, teamName } = details;
+      const { email, password, teamName, team } = details;
 
       try {
         await createUserWithEmailAndPassword(auth, email, password);
@@ -75,7 +75,7 @@ export default createStore({
 
       commit('SET_USER', auth.currentUser)
 
-      createTeam(teamName, email);
+      createTeam(teamName, email, team);
 
       router.push('/')
     },

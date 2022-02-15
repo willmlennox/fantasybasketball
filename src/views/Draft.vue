@@ -2,8 +2,10 @@
   <main class="draft">
     <h1 class="draftH">MIKE BASKETBALL TEAM FANTASY BASKETBALL DRAFT</h1>
 
-    <button class="draftBtn" v-if=" user.email == 'will@will.com' " @click="createDraftOrder()">CREATE DRAFT ORDER</button>
-
+    <div class="createDraft">
+        <button class="draftBtn" v-if=" user.email == 'will@will.com' " @click="createDraftOrder()">CREATE DRAFT ORDER</button>
+    </div>
+    
     <div class="lastDraftedDiv">
         <a v-for="{ id, Team } in lastDrafted" :key="id">{{ id }} was drafted by {{ Team }}.</a>
     </div>
@@ -15,6 +17,7 @@
                 <thead>
                     <tr>
                         <th class="empty"></th>
+                        <th>ADP</th>
                         <th class="playerName">PLAYER NAME</th>
                         <th>GENDER</th>
                         <th>HEIGHT</th>
@@ -23,13 +26,14 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="{ id, Gender, Height, Position, Photo } in players" :key="id">
+                    <tr v-for="{ id, Gender, Height, Position, Photo, ADP } in players" :key="id">
                         <img :src="require(`../assets/${Photo}`)">
+                        <td>{{ ADP }}</td>
                         <td class="playerName">{{ id }}</td>
                         <td>{{ Gender }}</td>
                         <td>{{ Height }}</td>
                         <td>{{ Position }}</td>
-                        <div v-for="team in currentTeam" :key="team">
+                        <div class="draftBtnDiv" v-for="team in currentTeam" :key="team">
                             <button class="draftBtn" v-if=" team.CurrentTeam == user.email " @click="draftPlayer(id, user.email)">DRAFT</button>
                         </div>
                     </tr>
@@ -126,6 +130,7 @@ td, th {
     padding-left: 1rem;
     height: 5rem;
     text-align: left;
+    margin: auto;
 }
 
 .playerName {
@@ -134,7 +139,6 @@ td, th {
 
 .draft {
   background-image: linear-gradient(-180deg, #768c96 0%, #52585a 100%);
-  border-radius: .5rem;
   box-sizing: border-box;
   color: #FFFFFF;
   display: block;
@@ -143,7 +147,6 @@ td, th {
   width: 100%;
   border: 0;
 }
-
 
 .draftBtn {
   background-image: linear-gradient(-180deg, #37AEE2 0%, #1E96C8 100%);
@@ -196,6 +199,11 @@ td, th {
 
 .teamList {
     margin-bottom: 5rem;
+}
+
+.createDraft {
+    width: 10%;
+    margin: auto;
 }
 
 img {

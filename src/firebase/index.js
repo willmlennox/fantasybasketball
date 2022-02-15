@@ -22,18 +22,26 @@ const teamsCollection = collection(db, "Teams");
 const gamesCollection = collection(db, "Games");
 const draftCollection = collection(db, "Draft");
 
+const maxNumTeams = 3;
+
 // Firestore functions
-const createTeam = async (teamName, email) => {
+const createTeam = async (teamName, email, team) => {
+  if (team == true) {
+    const teams = await getDocs(teamsCollection);
+    if(teams.size < maxNumTeams) {
+      const docRef = doc(teamsCollection, email);
 
-  const docRef = doc(teamsCollection, email);
-
-  await setDoc(docRef, {
-    TeamName: teamName,
-    M: "",
-    F: "",
-    UTIL: "",
-  });
-
+      await setDoc(docRef, {
+        TeamName: teamName,
+        M: "",
+        F: "",
+        UTIL: "",
+      });
+    }
+    else {
+      alert("There is the maximum number of teams already.")
+    }
+  }
 };
 
 const createGame = async (gameNum, players) => {
@@ -164,7 +172,7 @@ const getTeamPlayers = (email) => {
 
 const getUndraftedPlayers = () => {
   const players = ref([]);
-  const q = query(playersCollection, where("Team", "==", ""))
+  const q = query(playersCollection, where("Team", "==", ""), orderBy("ADP"))
   const close = onSnapshot(q, snapshot => {
     players.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
   });
@@ -280,6 +288,7 @@ const createDraftOrder = async () => {
       order++;
     })
   }
+  updateDoc(doc(draftCollection, "DraftOrder"), { [order]: "" })
 
   // Get current draft number
   var currPos = doc(draftCollection, "DraftPosition");
