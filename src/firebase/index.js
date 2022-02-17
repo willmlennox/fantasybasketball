@@ -321,6 +321,23 @@ const updateStat = async (gameNum, players) => {
   });
 }
 
+const resetGameStats = async () => {
+
+  const playerDocs = await getDocs(playersCollection);
+  playerDocs.forEach( async (player) => {
+    await updateDoc(doc(playersCollection, player.id), { GameStats: {
+      PTS: 0,
+      AST: 0,
+      REB: 0,
+      BLK: 0,
+      ST: 0,
+      TO: 0,
+      FPTS: 0,
+    }})
+  })
+  return playerDocs;
+}
+
 export { auth, 
         createTeam,
         createGame,
@@ -337,4 +354,5 @@ export { auth,
         getCurrentDraftTeam,
         createDraftOrder,
         listTeams,
+        resetGameStats,
       }

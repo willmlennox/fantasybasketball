@@ -191,7 +191,7 @@ td, th {
     float: right;
 }
 
-.column1 {
+.column2 {
     padding-right: 2rem;
     width: 50%;
     float: left;
