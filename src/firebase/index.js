@@ -60,7 +60,8 @@ const createGame = async (gameNum, players) => {
 
 const getPlayers = () => {
   const players = ref([]);
-  const close = onSnapshot(playersCollection, snapshot => {
+  const q = query(playersCollection, orderBy("TotalStats.FPTS", "desc"))
+  const close = onSnapshot(q, snapshot => {
     players.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
   });
   onUnmounted(close);
@@ -239,14 +240,14 @@ const draftPlayer = async (id, email) => {
       DraftPos: num,
     });
 
-  num += 1;
-  await updateDoc(doc(draftCollection, "DraftPosition"), { CurrentPos: num })
+    num += 1;
+    await updateDoc(doc(draftCollection, "DraftPosition"), { CurrentPos: num })
 
-  // Update current team drafting
-  var orderRef = doc(draftCollection, "DraftOrder");
-  const order = await getDoc(orderRef);
-  const curTeam = order.data()[num];
-  await updateDoc(doc(draftCollection, "DraftPosition"), { CurrentTeam: curTeam })
+    // Update current team drafting
+    var orderRef = doc(draftCollection, "DraftOrder");
+    const order = await getDoc(orderRef);
+    const curTeam = order.data()[num];
+    await updateDoc(doc(draftCollection, "DraftPosition"), { CurrentTeam: curTeam })
 
   });
 }
@@ -271,6 +272,7 @@ const createDraftOrder = async () => {
     [teams[i], teams[j]] = [teams[j], teams[i]];
   }
 
+  // snake order
   for (let i = 0; i < maxTeamSize; i++) {
     teamDocs.forEach(() => {
       updateDoc(doc(draftCollection, "DraftOrder"), { [order]: teams[c] })
@@ -321,21 +323,89 @@ const updateStat = async (gameNum, players) => {
   });
 }
 
-const resetGameStats = async () => {
+const resetGameStats = async (date, gameScore) => {
 
+  var gameLog = [];
+  var teams = {};
+  var teamRef = ({});
   const playerDocs = await getDocs(playersCollection);
-  playerDocs.forEach( async (player) => {
-    await updateDoc(doc(playersCollection, player.id), { GameStats: {
-      PTS: 0,
-      AST: 0,
-      REB: 0,
-      BLK: 0,
-      ST: 0,
-      TO: 0,
-      FPTS: 0,
-    }})
+  playerDocs.forEach(async player => {
+    if(player.data().Team != "") {
+      if(!teams[player.data().Team]) {
+        teams[player.data().Team] = player.data().GameStats.FPTS;
+      } else {
+        teams[player.data().Team] += player.data().GameStats.FPTS;
+      }
+    }
+    gameLog = [];
+
+    if(player.data().GameLog) {
+      gameLog = player.data().GameLog;
+    }
+
+    gameLog.push(
+      {
+        Date: date,
+        GameScore: gameScore,
+        PTS: player.data().GameStats.PTS,
+        AST: player.data().GameStats.AST,
+        REB: player.data().GameStats.REB,
+        BLK: player.data().GameStats.BLK,
+        ST: player.data().GameStats.ST,
+        TO: player.data().GameStats.TO,
+        FPTS: player.data().GameStats.FPTS,
+      }
+    )
+    
+    await updateDoc(doc(playersCollection, player.id), { 
+      TotalStats: {
+        PTS: player.data().TotalStats.PTS + player.data().GameStats.PTS,
+        AST: player.data().TotalStats.AST + player.data().GameStats.AST,
+        REB: player.data().TotalStats.REB + player.data().GameStats.REB,
+        BLK: player.data().TotalStats.BLK + player.data().GameStats.BLK,
+        ST: player.data().TotalStats.ST + player.data().GameStats.ST,
+        TO: player.data().TotalStats.TO + player.data().GameStats.TO,
+        FPTS: player.data().TotalStats.FPTS + player.data().GameStats.FPTS,
+      },
+      GameLog: gameLog,
+      GameStats: {
+        PTS: 0,
+        AST: 0,
+        REB: 0,
+        BLK: 0,
+        ST: 0,
+        TO: 0,
+        FPTS: 0,
+      }
+    })
+  });
+
+  const q = query(teamsCollection, orderBy("TeamFPTS", "desc"));
+  const teamDocs = await getDocs(q);
+  var c = 1;
+  teamDocs.forEach(doc => {
+    teams[doc.id + "R"] = c;
+    c++;
   })
-  return playerDocs;
+
+  for (var key in teams) {
+    teamRef = doc(teamsCollection, key);
+    const team = await getDoc(teamRef);
+    await updateDoc(doc(teamsCollection, key), {
+      TeamFPTS: team.data().TeamFPTS + teams[key],
+      Rank: teams[key + "R"],
+    })
+  }
+}
+
+const listStandings = () => {
+  const teams = ref([]);
+  const q = query(teamsCollection, orderBy("TeamFPTS", "desc"));
+  const close = onSnapshot(q, snapshot => {
+    teams.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+  });
+  onUnmounted(close);
+  return teams;
 }
 
 export { auth, 
@@ -355,4 +425,5 @@ export { auth,
         createDraftOrder,
         listTeams,
         resetGameStats,
+        listStandings,
       }

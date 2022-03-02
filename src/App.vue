@@ -1,7 +1,7 @@
 <template>
   <div id="nav" v-if="$store.state.user">
     <router-link class="navLink" to="/">TEAMS</router-link> 
-    <router-link class="navLink" to="/about">PLAYERS</router-link> 
+    <router-link class="navLink" to="/players">PLAYERS</router-link> 
     <router-link class="navLink" to="/draft">DRAFT</router-link>
     <button class="logoutBtn" @click="$store.dispatch('logout')">LOGOUT</button>
   </div>

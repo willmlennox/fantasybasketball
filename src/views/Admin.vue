@@ -36,11 +36,25 @@
         </table>
 
     </div>
+    <div>
+        <form class="createGame" @submit.prevent="create">
+        <h2>Upload Game</h2>
+        <input 
+        v-model="gameDate"
+        type="text" 
+        placeholder="MONTH DAY YEAR" required />
+        <input 
+        v-model="gameScore"
+        type="text" 
+        placeholder="W/L, (US)-(THEM)" required />
+        <button class="btn" @click="resetGameStats(gameDate, gameScore)">UPLOAD GAME</button>
+        </form>
+    </div>
   </main>
 </template>
 <script>
 
-import { auth, getPlayerNames, createGame, updateStat, getPlayerStats} from '../firebase'
+import { auth, getPlayerNames, createGame, updateStat, getPlayerStats, resetGameStats } from '../firebase'
 import { ref } from 'vue';
 
 export default {
@@ -57,7 +71,8 @@ export default {
             gameNum,
             playerStats,
             createGame,
-            updateStat
+            updateStat,
+            resetGameStats,
         };
     },
     

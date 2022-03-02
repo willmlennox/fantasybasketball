@@ -63,15 +63,30 @@
       </div>
 
       <div class="standings">
-        <table class="standingsTable">
-          <thead>
-            <tr>
-              <!-- <th>Test</th>
-              <th>Test</th>
-              <th>Test</th>
-              <th>Test</th> -->
-            </tr>
-          </thead>
+        <h1 class="title">TEAM STANDINGS</h1>
+        <table class="teamList">
+            <thead>
+                <tr>
+                    <th class="empty"></th>
+                    <th class="empty"></th>
+                    <th>FPTS</th>
+                    <th class="playerName">TEAM NAME</th>
+                    <th>M</th>
+                    <th>F</th>
+                    <th>UTIL</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="{ TeamName, M, F, UTIL, Rank, TeamFPTS, Photo } in standings" :key="TeamName">
+                  <img :src="require(`../assets/${Photo}`)">
+                  <td>{{ Rank }}</td>
+                  <td>{{ TeamFPTS }}</td>
+                  <td class="playerName">{{ TeamName }}</td>
+                  <td>{{ M }}</td>
+                  <td>{{ F }}</td>
+                  <td>{{ UTIL }}</td>
+                </tr>
+            </tbody>
         </table>
       </div>
 
@@ -83,16 +98,17 @@
 </template>
 
 <script>
-import { auth, listTeams } from '../firebase'
+import { auth, listStandings, listTeams } from '../firebase'
 
 export default {
 
     setup () {
       const user = auth.currentUser;
       const teams = listTeams();
+      const standings = listStandings();
       
 
-      return { user, teams };
+      return { user, teams, standings };
     },
 
 }
@@ -165,6 +181,6 @@ img {
 
 .container {
     display: flex;
-    font-size: 10px;
+    font-size: 12px;
 }
 </style>
