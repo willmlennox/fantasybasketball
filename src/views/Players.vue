@@ -24,7 +24,7 @@
               <tbody>
                   <tr v-for="player in players" :key="player">
                     <img :src="require(`../assets/${player.Photo}`)">
-                    <td class="playerName"><a :href="'/' + player.id">{{ player.id }}</a> <p :class="{ healthy: (player.STATUS == 'HEALTHY') }">{{ player.STATUS }}</p></td>
+                    <td class="playerName"><router-link :to="{name: 'Player', params: {pid: player.id}}">{{ player.id }}</router-link> <p :class="{ healthy: (player.STATUS == 'HEALTHY') }">{{ player.STATUS }}</p></td>
                     <td>{{ player.TotalStats.PTS }}</td>
                     <td>{{ player.TotalStats.AST }}</td>
                     <td>{{ player.TotalStats.REB }}</td>
@@ -32,6 +32,7 @@
                     <td>{{ player.TotalStats.ST }}</td>
                     <td>{{ player.TotalStats.TO }}</td>
                     <td>{{ player.TotalStats.FPTS }}</td>
+                    <button class="draftBtn" v-if=" player.Team == '' " v-on:click="addPlayer(player.id, user.email)" >+</button>
                   </tr>
               </tbody>
           </table>    
@@ -41,17 +42,23 @@
 </template>
 
 <script>
-import { getPlayers } from '../firebase'
+import { auth, getPlayers } from '../firebase'
 
 export default {
 
     setup () { 
 
       const players = getPlayers();
+      const user = auth.currentUser;
 
-      return { players };
+      return { players, user };
       
     },
+    methods: {
+      addPlayer(playerid, teamid) {
+        this.$router.push({name: 'AddPlayer', params: {pid: playerid, tid: teamid}});
+      }
+    }
 
 }
 </script>
@@ -122,5 +129,33 @@ img {
 .players {
     font-size: 12px;
     margin: auto;
+}
+
+.draftBtn {
+  background-image: linear-gradient(-180deg, #37AEE2 0%, #1E96C8 100%);
+  border-radius: .5rem;
+  box-sizing: border-box;
+  color: #FFFFFF;
+  display: flex;
+  font-size: 16px;
+  justify-content: center;
+  padding: 1rem 1.75rem;
+  text-decoration: none;
+  width: 60%;
+  border: 0;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+
+.draftBtn:hover {
+  background-image: linear-gradient(-180deg, #1D95C9 0%, #17759C 100%);
+}
+
+@media (min-width: 768px) {
+  .draftBtn {
+    padding: 1rem 2rem;
+  }
 }
 </style>

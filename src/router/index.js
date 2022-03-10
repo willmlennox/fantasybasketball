@@ -37,6 +37,22 @@ const routes = [
     name: 'Admin',
     component: () => import('../views/Admin.vue'),
     meta: {
+      requiresAuth: true
+    }
+  },
+  {
+    path: '/player/:pid',
+    name: 'Player',
+    component: () => import('../views/Player.vue'),
+    meta: {
+      requiresAuth: false
+    }
+  },
+  {
+    path: '/add/:tid/:pid',
+    name: 'AddPlayer',
+    component: () => import('../views/AddPlayer.vue'),
+    meta: {
       requiresAuth: false
     }
   }

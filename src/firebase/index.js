@@ -408,6 +408,72 @@ const listStandings = () => {
   return teams;
 }
 
+const getPlayerLog = (pid) => {
+  const player = ref([]);
+  const close = onSnapshot(doc(playersCollection, pid), snapshot => {
+    player.value = snapshot.data()
+    player.value["id"] = snapshot.id
+  });
+  onUnmounted(close)
+  return player;
+}
+
+const getTeamForAdd = (tid) => {
+  const team = ref([]);
+  var playerList = [];
+  var d = {};
+
+  const close2 = onSnapshot(playersCollection, players => {
+    players.forEach((doc) => {
+      playerList.push(doc);
+    });
+  });
+
+  const close = onSnapshot(doc(teamsCollection, tid), snapshot => {
+
+    d = {
+      "teamName": null,
+      "id": tid,
+      "M": null,
+      "F": null,
+      "UTIL": null,
+    };
+    
+    d["teamName"] = snapshot.data().TeamName;
+
+    playerList.forEach((doc) => {
+      if (doc.id == snapshot.data().M) {
+        d["M"] = doc.data();
+        d["M"]["id"] = doc.id;
+      } else if (doc.id == snapshot.data().F) {
+        d["F"] = doc.data();
+        d["F"]["id"] = doc.id;
+      } else if (doc.id == snapshot.data().UTIL) {
+        d["UTIL"] = doc.data();
+        d["UTIL"]["id"] = doc.id;
+      }
+    });
+    team.value = d;
+  });
+
+  onUnmounted(close);
+  onUnmounted(close2);
+
+  return team;
+}
+
+const addPlayer = async (p1, p2, t, g) => {
+  await updateDoc(doc(playersCollection, p1), {
+    Team: t
+  })
+  await updateDoc(doc(playersCollection, p2), {
+    Team: ""
+  })
+  await updateDoc(doc(teamsCollection, t), {
+    [g]: p1
+  })
+}
+
 export { auth, 
         createTeam,
         createGame,
@@ -426,4 +492,7 @@ export { auth,
         listTeams,
         resetGameStats,
         listStandings,
+        getPlayerLog,
+        getTeamForAdd,
+        addPlayer,
       }
